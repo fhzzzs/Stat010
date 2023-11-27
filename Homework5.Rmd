@@ -1,0 +1,279 @@
+---
+title: "Homework 5"
+author: "Ivan Ao"
+output:
+  html_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(maps)
+```
+
+
+
+# Instructions
+- If you wish to use any additional packages beyond "Base R" (the default) or `maps` then email Rebecca (`rkurt001@ucr.edu`) for permission. 
+- Use R to answer the questions below. 
+- Check Piazza regularly for clarification on questions, there may be important posts that will not be announced through *Elearn*.  
+
+# Best Road Trip Ever (Background Information)
+
+
+There is a well known problems in data-science/computer-science/optimization where we want to determine the best route possible when trying to go to multiple destinations.  Finding the best possible route is very difficult! Instead, researchers often use algorithms to determine the best route. There have been several articles online of different researchers trying to do this ([see example](https://www.digitaltrends.com/cool-tech/most-efficient-route-visit-us-states/)).  For this homework problem you are going to search for an efficient route that takes you to all of the US State Capitals (excluding Alaska and Hawaii).  For your route you need to visit each capital city exactly once, and must start and stop at the same city. 
+
+To create your route you will use the following "greedy" algorithm.  
+
+1) Start at initial city. 
+
+2) Search for the next closest city that you have not yet visited. 
+
+3) Move to the city identified in previous step. 
+
+4) If you still have cities you have not visited return to step 2.  Otherwise, if you visited all cities, return to starting city. 
+
+In this algorithm you need to select a distance function to calculate the distance between cities. For example: "euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski" etc.  The steps outlined below will help us determine a route. This problem is known as "the traveling sales man" problem. You will need the location of every US State Capital City, and it is provided below. 
+
+```{r}
+library(maps)
+
+# US State Capitals (all)
+capital_cities <- us.cities[us.cities$capital==2, ]
+
+# Remove Alaska and Hawaii 
+index <- which(capital_cities$country.etc  %in% c("AK", "HI"))
+capital_cities <- capital_cities[-index, ]
+```
+
+
+
+## PART 1
+
+
+**Question 1: Base R Graphics (10 points)**
+
+For this homework problem we will be using `nba.csv` file on ELEARN.  This data comes from the [2021-2022 NBA Player Stats](https://www.kaggle.com/vivovinco/nba-player-stats) on the website *Kaggle.com*. 
+
+1a) Create side-by-side boxplots of the `MP` variable broken up by `Pos` (the different positions). Make sure there are appropriate axis labels. Use the argument `col` so that *each boxplot is a different color* of your choice.  (1 point)
+```{r}
+nba <- read.csv("./nba.csv")
+boxplot(MP ~ Pos, data = nba, col = c("red","green","blue"))
+```
+
+
+
+1b) Plot a histogram of any numerical variable that you wish from this data set.  Put three distinctly different vertical lines indicating the (arithmetic) mean of this variable, the median of this variable, and the value for a player of your choice.  Include a legend for your plot. (2 points)
+```{r}
+hist(nba$Age)
+abline(v = mean(nba$Age), col = "red")
+abline(v = median(nba$Age), col = "green")
+abline(v = 24, col = "blue")
+```
+
+
+
+1c) Create a new data set that only contains players from the California NBA teams.  That is, the rows where `Tm` equals: `GSW` (Golden State Warriors), `LAL` (Los Angeles Lakers), `LAC` (Los Angeles Clippers), or`SAC` (Sacramento Kings).  Call this `NBAcali`. Organize the rows of this data set first by `Pts`, and then by `G` (minutes per game). Display the first 10 rows and 5 columns of this data set. (2 point)
+```{r}
+NBAcali <- nba[nba$Tm == "GSW" | nba$Tm == "LAL"  | nba$Tm == "LAc"  | nba$Tm == "SAC",]
+NBAcali <- NBAcali[ , c("G",
+                       names(NBAcali)[names(NBAcali) != "G"])]
+NBAcali <- NBAcali[ , c("PTS",
+                       names(NBAcali)[names(NBAcali) != "PTS"])]
+NBAcali[1:10,1:5]
+```
+
+
+
+1d) Find the proportion of players that belong to the different categories for the `Pos` (position) variable in the for the full data set, and for the `NBAcali` data set.  Create a plot of your choice that gives a visual representation of these proportions, and plot the proportions for each data set side-by-side.  Make sure there are appropriate titles. HINT: Consider `pie()` or `barplot()`.  (2 points) 
+```{r}
+
+pie(sort(table(factor(nba$Pos))), labels = levels(factor(nba$Pos)),radius = 1)
+```
+
+
+1e) Create a scatter plot of your choice. Have the points differ in some aspect (color/shape/size/etc) based on a criteria of your choice. Include a legend for your plot. (2 point)
+```{r}
+plot(nba$Age,nba$PTS, col = c("red","green", "blue"), pch = 12)
+legend(x = "topright", legend = "NBA player", col = "yellow", pch = 12)
+```
+
+
+1f) Describe what you plotted above in the previous problem.  (i.e. what variable is on each axis, why do some of the points differ, etc.) (1 point)\
+I plot the nba players age as x-axis and points for y-axis. I found out that old nba player is getting less points than a younger one.
+
+**Question 2: Practice with Loops (4 points) **
+
+2a) Create the function which has one argument `n`.  Have this function generate the first $n$ Fibannaci numbers using a **for** loop.  Note that the Fibanacci sequence is formed by starting with the number 0, 1 and then adding the last two numbers to get the next number: 0, 1, 1, 2, 3, 5, 8, etc. Call your function using `n=10` and `n=15` (2 points). 
+```{r}
+fib <- function(n)
+{
+  vec <- c(0,1) 
+  while(length(vec) <= n)
+  {
+    vec <- c(vec, vec[length(vec)] + vec[length(vec) - 1])
+  }
+  return(vec)
+}
+fib(n=10)
+fib(n=15)
+```
+
+
+
+2b) Create a function which has one argument `num`.  Have this function generate the factorial of this number using any iteration technique you would like.  Recall that a factorial of a number is product of all whole numbers from our chosen number down to 1. For example, 4! (4 factorial) = 4(3)(2)(1) = 24. Do not use `factorial()` in your function. Call your function using using `n=5` and `n=7`.(2 points) 
+```{r}
+num_factorial <- function(num)
+{
+  res <- 1
+  for(i in num:1)
+  {
+    res <- res * i
+  }
+  return(res)
+}
+num_factorial(num = 5)
+num_factorial(num = 7)
+```
+
+
+**Question 3: Best Road Trip Ever (9 points)**
+
+Use the background information above to complete this problem.  You will be trying to find a route to drive across the country. To check your work for this question see this [webapp](https://rpgarcia.shinyapps.io/Distances/). 
+
+
+3a) Pick two distance formulas. Write out the formulas you picked in LaTeX syntax below. (1 point)\
+$d = \sqrt {\left( {x_1 - x_2 } \right)^2 + \left( {y_1 - y_2 } \right)^2 }$\
+$d = \sqrt {\sum _{i=1}^{n}  \left( x_{i}-y_{i}\right)^2 }$\
+
+3b)  Create a function for one of the distance formulas above that can calculate the distance between two points. NOTE: This is not the distance in miles, we are using longitude and latitude coordinates, so this is just a rough approximation of the relative distance between two places.  (1 point)
+```{r}
+cal_dis <- function(a,b)
+{
+  res <- sqrt((a[[1]] - b[[1]])^2 + (a[[2]] - b[[2]])^2)
+  return(res)
+}
+```
+
+
+
+3c) Use your function above to calculate the distance between the Sacramento-CA and every other capital city by using the longitude and latitude coordinates. HINT: Consider one of the apply/sapply/mapply/etc functions. (1 point)
+```{r}
+cord <- function(a,b)
+{
+  res <- c()
+  for(i in 1:length(a))
+  {
+    res <- append(res, list(c(a[i],b[i])))
+  }
+  return(res)
+}
+cords <- cord(capital_cities[,4],capital_cities[,5])
+sacramento <- c(capital_cities[40,4],capital_cities[40,5])
+unlist(lapply(cords, cal_dis, b = sacramento))
+```
+
+
+3d) Create a loop that determines the best route to each capital city. Pick a starting city of your choice. Determine the city with the shortest distance, record what city it is, and remove it from consideration.  Then continue repeating these steps until you have removed every city and the loop is terminated.  You should have a record of the order of cities to visit. (3 points)
+```{r}
+first_visit <- capital_cities[1,]
+order_visit <- list(first_visit)
+citys <- capital_cities[-which(capital_cities$country.etc == "NY"),]
+while(nrow(citys) > 0)
+{
+  cords <- cord(citys[,4],citys[,5])
+
+  curr_city_cords <- c(order_visit[[length(order_visit)]][,4],
+                       order_visit[[length(order_visit)]][,5])
+  
+  closest <- citys[which.min(unlist(lapply(cords, cal_dis, b = curr_city_cords))),]
+  
+  order_visit <- c(order_visit, list(closest))
+  
+  citys <-  citys[-which(citys$country.etc == citys$country.etc[which.min(unlist(lapply(cords, cal_dis, b = curr_city_cords)))]),]
+}
+
+
+```
+
+
+
+3e) OPTION 1: Calculate the total distance traveled for the route you determined above (you should start and end in the same city). OPTION 2:  Calculate the total distance if you travel to each capital city in the original order given above, i.e.:  "Albany NY" , "Annapolis MD", ..., "Topeka KS", "Trenton NJ", and then back to "Albany NY".  You only have to pick one of these options. (2 point)
+```{r}
+cords <- cord(capital_cities[,4],capital_cities[,5])
+cords2 <- c(cords[-1], cords[1])
+sum(unlist(lapply(cords, cal_dis, b = cords2)))
+```
+
+
+
+3f) OPTION 1: Plot each state capital as a point on a map of the United States.  Plot connecting lines between the cities in the order of the route you found in 3d.  OPTION 2:   Plot each state capital as a point on a map of the United States. Plot connecting lines to each capital city in the original order given above, i.e.:  "Albany NY" , "Annapolis MD", ..., "Topeka KS", "Trenton NJ", and then back to "Albany NY". You only have to pick one of these options.(1 point)
+```{r}
+visit_order <- unlist(order_visit)
+lat <- visit_order[names(visit_order) == "lat"]
+long <-  visit_order[names(visit_order) == "long"]
+map("usa")
+points(long,lat, type = "b", pch = 16)
+```
+
+
+
+**OPTIONAL QUESTIONS**
+
+The following prompts are completely optional, and are just for you to think about.  You are encouraged to respond, but you will not be graded on this. 
+
+- Repeat the previous steps above starting at all of the different cities, creating a total of 48 routes. Which starting city has the smallest total distance traveled?   Which starting city has the best practical route? HINT: Turn your code above into a function that takes the starting city as an input value, and have the function return the total distance traveled.
+
+- The "distance" we are calculating is based on latitude and longitude coordinates, and not road maps. If we instead calculated the distance in miles **on roads** between cities, how different do you think your results would be?  
+
+- We used longitude and latitude values and the formulas above to approximate the distance.  Is this a reasonable approximation for car-travel, airline travel, etc?  Why or why not?
+
+- We get a different route based on the starting city.  Do you think that one of these routes is the **best** possible route?  Why or why not?  How could you find the **best** possible route?
+
+- What are the advantages between the different distance formulas?
+
+- How do you would want to determine what the possible route is?  Distance traveled in terms of longitude/latitude coordinates, distance traveled in miles on roads in a car, distance traveled via planes, least amount of backtracking, shortest amount of time, etc?
+
+- Where do you also see similar problems like the one described in the previous question?
+
+
+
+
+## PART 2
+
+**Question 4: Mini Package Tutorial (8 points)**
+
+Create your own mini package tutorial! Upload a separate RMD and PDF file containing at least 3 plots that are created using a package of your choice.  The list below has been pre-approved.  If you wish to use package beyond the list below email Rebecca (rkurt001@ucr.edu) for permission. 
+
+
+Your tutorial should be professional, descriptive, and use complete sentences.  There should be at least three examples of how to create figures with your chosen package. All examples should have a corresponding written explanation of the functions or arguments used to generate the figure that are unique to your package. In addition, you should describe in detail what each figure is plotting. The three examples should be distinctly different from each other, and should not be complete replicas from other tutorials online.  You can pick any data set you would like to showcase your package. However, if you pick a data set that is not built into R, or supplied from class, you need to upload the data set as well. 
+
+
+- [showtext](https://cran.r-project.org/web/packages/showtext/): Extend the fonts of R
+
+- [emojis](https://cran.r-project.org/web/packages/emojifont/): Add emojis to plots. 
+
+- [viridis](https://cran.r-project.org/web/packages/viridis/index.html): Color palettes for common forms of color blindness and/or color vision deficiency. 
+
+- [RColorBrewer](https://cran.r-project.org/web/packages/RColorBrewer/index.html): Color palettes particularly common for maps. 
+
+- [wesanderson](https://cran.r-project.org/web/packages/wesanderson/index.html): Color palettes generated mostly from 'Wes Anderson' movies.
+
+
+- [corrplot](https://cran.r-project.org/web/packages/corrplot/): Provides a visual exploratory tool on correlation matrix that supports automatic variable reordering to help detect hidden patterns among variables.
+
+- [heatmp](https://cran.r-project.org/web/packages/heatmap3/): Create heat maps. 
+
+- [riverplot](https://cran.r-project.org/web/packages/riverplot/): Implements Sankey or Ribbon plots. 
+
+- [sinaplot](https://cran.r-project.org/web/packages/sinaplot/): Creates enhanced jitter strip chart, where the width of the jitter is controlled by the density distribution of the data within each class. 
+
+- [vcd](https://cran.r-project.org/web/packages/vcd/): Visualization techniques, data sets, summary and inference procedures aimed particularly at categorical data. 
+
+- [visreg](https://cran.r-project.org/web/packages/visreg/): If you know about linear regression, you can use this make advanced linear regression plots. 
+
+- [vioplot](https://cran.r-project.org/web/packages/vioplot/index.html): Creates violin plots which are a combination of a box plot and a density plot (density plots look kinda like histograms). 
+
+
+
+

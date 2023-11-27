@@ -1,0 +1,241 @@
+---
+title: "Homework 2"
+author: "Ivan Ao"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+- If you wish to use any additional packages beyond "Base R" (the default) then email Rebecca (`rkurt001@ucr.edu`) for permission. 
+- Use R to answer the questions below. 
+- Check Piazza regularly for clarification on questions, there may be important posts that will not be announced through *Elearn*.  
+
+
+# Questions 
+
+**Question 1: Factors (8 points)**
+
+Use the data frame `mtcars`, which is a built in data set in R, to answer the questions below.  Display the final objects created/adjusted for each question. 
+
+1a) Create a factor vector called `vs` from the `vs` column of `mtcars`. Make sure it has two levels: 0, 1. 
+```{r}
+vs <- factor(mtcars$vs)
+vs
+```
+
+
+
+1b) Create a factor vector called `carb` from the `carb` column of `mtcars`.  Have this be an ordered factor with levels:  1 < 2 < 3 < 4 < 5 < 6 < 7 < 8. HINT: Some of these levels do not appear automatically. 
+```{r}
+carb <- factor(c(mtcars$carb),ordered = T)
+carb
+```
+
+
+1c) Create a frequency table for the column `mpg`. 
+```{r}
+mpg <- factor(mtcars$mpg)
+table(mpg)
+```
+
+
+1d) Create a two way frequency table for the factor vectors `vs` and `carb`. 
+```{r}
+table(vs,carb)
+
+```
+
+
+1e) Redefine the vectors `vs` and `carb` to be character vectors. 
+```{r}
+vs <- as.character(vs)
+carb <- as.character(carb)
+vs
+carb
+class(vs)
+class(carb)
+```
+
+1f) Create a two way frequency table for `vs` and `carb` again.
+```{r}
+table(vs,carb)
+```
+
+
+1g) Comment on the difference between the frequency table in 1d and 1f. 
+No different on 1d and 1f
+
+1h) Display everything inside the vector `carb` except the second to last element. 
+```{r}
+show(carb[1:(length(carb) - 2)])
+show(carb[length(carb)])
+```
+
+
+**Question 2: Calculations Review and Factors (8 points)**
+
+Use the data frame `mtcars`, which is a built in data set in R, to answer the questions below.  Display the final objects created/adjusted for each question. 
+
+
+2a) Create a double vector called `cyl` from the `cyl` column of `mtcars`. Create a frequency table for the values of this vector. 
+```{r}
+cyl <- mtcars$cyl
+cyl
+typeof(cyl)
+```
+
+
+2b) Calculate the (arithmetic) mean, median, geometric mean, and harmonic mean for the vector `cyl`. (You can use any base R function for this.)  
+```{r}
+cyl_mean <- mean(cyl)
+medi <- median(cyl)
+geo_mean <- exp(mean(log(cyl)))
+harm_mean <- sum(cyl^-1 / length(cyl))
+cyl_mean
+medi
+geo_mean
+cyl_mean
+
+```
+
+2c) Store the results of the (arithmetic) mean, median, geometric mean, and harmonic mean for `cyl` in a *named* list called `measures_of_center`.  The names should indicate which statistic is which. 
+```{r}
+measures_of_center <- c("mean" = cyl_mean, "median" = medi, "geometric mean" = geo_mean, "harmonic mean" = cyl_mean)
+measures_of_center
+```
+
+2d) Calculate the variance, mean deviation, coefficient of variation, and range for the vector `cyl`. (You can use any base R function for this.) 
+```{r}
+variance <- var(cyl)
+mean_devi <- mad(cyl)
+coeff <- sd(cyl) / mean(cyl) * 100
+ran <- range(cyl)
+variance
+mean_devi
+coeff
+ran
+```
+
+
+2e) Store the results of the variance, mean deviation, coefficient of variation, and range for the vector `cyl` in a *named* list called `measures_of_spread`.  The names should indicate which statistic is which.
+```{r}
+measures_of_spread <- c("variance" = variance, "mean deviation" = mean_devi, "coefficient of variation" = coeff, "range" = ran)
+measures_of_spread
+```
+
+
+2f) Create and store a frequency table for `cyl` in a object called `cyl_freq`. 
+```{r}
+cyl_freq <- table(cyl)
+cyl_freq
+```
+
+
+**Question 3: Lists and Indexing (5 points)**
+
+Use values and objects created above to complete the following questions. 
+
+3a) Create a list with the following elements, in order: `cyl`, `measures_of_center`, `measures_of_spread`, `cyl_freq`.  Use the `str()` command to display the structure of the list. 
+```{r}
+temp <- list(cyl, measures_of_center, measures_of_spread, cyl_freq)
+temp
+```
+
+
+3b) Name the elements of the list (4 names) (if you have not done so already). Use the `str()` command to display the structure of the list. 
+```{r}
+names(temp) <- c("cyl", "measures_of_center", "measures_of_spread", "cyl_freq")
+str(temp)
+temp
+```
+
+
+3c) Access and display the second element of the list using its index number. 
+```{r}
+temp[2]
+```
+
+
+3d) Access and display the second element of the list using its name. 
+```{r}
+temp['measures_of_center']
+```
+
+
+3e) Access and display the (arithmetic) mean using any indexing technique. 
+```{r}
+temp[[2]][1]
+```
+
+
+
+**Question 4: Matrices and Data Frames (9 points) **
+
+4a) Create the a numeric matrix called `mymat` that contains 0.1, 2, 4 in the first column, 7, 3, 100 in the second column, and 1, 0.9, 8, in the third column. Type the name of the variable `mymat` so that it is displayed.
+```{r}
+mymat <- matrix(c(0.1, 2, 4,
+                  7, 3, 100,
+                  1, 0.9, 8), nrow = 3, ncol = 3)
+mymat
+
+```
+
+
+4b) Display the first row of the matrix. 
+```{r}
+mymat[1,]
+```
+
+
+4c) Use operators to generate and display a matrix of TRUE/FALSE values, where TRUE means the values in `mymat` are strictly greater than 1 AND less than or equal to `pi`. 
+```{r}
+mymat > 1 & mymat <= pi
+```
+
+
+4d) Display the element in the second row and third column. 
+```{r}
+mymat[2,3]
+```
+
+
+4e) Multiply the second column of the matrix by 10. 
+```{r}
+mymat[2,] * 10
+```
+
+
+4f) Use the function `data.frame()` to create a data frame object called `mydata` using the following sets of data for each column (3 rows, 4 columns). The column names (in order) should be: age, height, gender, and smoker. Make the class of each column the following (in order): numeric, numeric, factor, logical. 
+
+- 22, 25, 28
+
+- 66, 71, 64
+
+- F, M, F 
+
+- FALSE, TRUE, TRUE
+```{r}
+mydata <- data.frame(age = c(22,25,28),
+                     height = c(66,71,64),
+                     gender = factor(c('F', 'M', 'F')),
+                     smoker = c(FALSE,TRUE,TRUE))
+mydata
+```
+
+
+4g) Change the row names of the data frame in 4f to be three names of your choice. 
+```{r}
+rownames(mydata) <- c("Apple", "Banana" , "Orange")
+mydata
+```
+
+
+4h) Discuss two difference between a matrix and a data frame. 
+1.matrix can use index number to locate the element and dataframe cannot.
+2.matrix can only contain one type of data, but dataframe can contain different types of data.

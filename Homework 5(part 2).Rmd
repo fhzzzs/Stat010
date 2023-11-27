@@ -1,0 +1,44 @@
+---
+title: "Homework 5(part 2)"
+author: "haoyi Ao"
+date: "2023-02-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(heatmap3)
+```
+## Random data
+```{r}
+data <- matrix(c(1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,2,4,1), 
+               nrow = 6, ncol = 6)
+data
+```
+
+
+## Default graph
+\
+This give you the graph with all the default function.
+```{r}
+heatmap(data) 
+```
+
+# Function 1
+The symm function can only be true when x is a square matrix. that means nrow = ncol. This will transpose the matrix. That mean column became row, and row became column.
+```{r}
+heatmap(data, symm = T)
+```
+
+# Function 2
+The Rowv arguments determines how the row should be ordered by given a vector to order the row.
+```{r}
+heatmap(data, Rowv = c(10,9,8,7,6,5,4,3,2,1,0))
+```
+
+# Function 3
+The Colv argument act the same as the Rowv. You can use Colv = "Rowv" only when row number is equal to col number to make sure the order in row and col are the same.
+```{r}
+heatmap(data, Rowv = c(10,9,8,7,6,5,4,3,2,1,0), Colv = "Rowv")
+```
+

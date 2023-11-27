@@ -1,0 +1,308 @@
+---
+title: "Homework 6"
+author: "Ivan Ao"
+output:
+  html_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Instructions
+- If you wish to use any additional packages beyond "Base R" (the default), `maps`, or `tidyverse` then email Rebecca (`rkurt001@ucr.edu`) for permission. 
+- Use R to answer the questions below. 
+- Check Piazza regularly for clarification on questions, there may be important posts that will not be announced through *Elearn*.  
+
+
+# Questions 
+
+
+
+**Question 1: Fundamental Theorem of Statistics (3 points)**
+
+The fundamental theorem of statistics (or central limit theorem) goes by many names, and has several different variations.  Perhaps the most famous version of this theorem is related to the sample (arithmetic) mean.  The theorem states that if a set of independent data values is generated from a distribution that has a finite mean and variance, then the sample mean will converge to a normal distribution. We will observe this theory. 
+
+1a) (1 point) Pick a distribution: negative binomial, poison, exponential, or chi-squared (If you want to use another distribution that is not on this list email Rebecca for permission). Show an example of a built in function in R generating 30 data points from that distribution. Estimate the sample mean with these 30 data points. 
+```{r}
+data <- runif(30,0,10)
+mean(data)
+```
+
+
+1b) (1 point) Repeat (1b) 1000 times.  That is, continue generating samples of 30 data points from your distribution, and calculating the mean with these 30 samples.  You should have 1000 estimated means. Store your results in a vector.
+```{r}
+set.seed(123123)
+vec <- c()
+for(i in 1:1000)
+{
+  data <- runif(30,0,10)
+  vec <- c(vec,mean(data))
+}
+```
+
+
+1c) (1 point) Create a histogram of your estimated means from (1c).  Make sure the title, labels, colors, etc are professional and appropriate. 
+```{r}
+hist(vec, xlab = "Mean")
+```
+
+**Question 2: Poker Hands (7 points)**
+
+Below we have the code for a standard 52-deck of cards. These decks are used to play a game called poker.  In poker five cards are drawn, and players bet on if there collection of five cards is the most rare.  The different five card collections have different names: royal flush, straight flush, four of a kind, full house, flush, straight, three of a kind, two pair, pair.  These five card collections are called *hands*. 
+
+```{r}
+suit <- rep(c("Heart", "Diamond", "Spade", "Club"), each = 13)
+color <- rep(c("Red", "Black"), each = 26)
+value <- rep(c(2:10, "Jack", "Queen", "King", "Ace"), times = 4)
+card_deck <- data.frame(suit, color, value)
+```
+
+2a) (2 points) Create a function that checks if a collection of five cards is "four of a kind".  That is, four of the five inputted cards drawn have the same value. If so, return "Four of a kind", otherwise return "Other".
+```{r}
+FourOfAKind <- function(df)
+{
+  count <- 0
+  done <- F
+  j <- 1
+  while(!done && j < 6)
+  {
+    count <- 0
+    for(i in 1:5)
+    {
+      if(df[j,3] == df[i,3])
+      {
+        count <- count + 1
+      }
+    }
+    if(count == 4)
+    {
+      done <- T
+    }
+    j <- j + 1
+  }
+  
+  if(count == 4)
+  {
+    return("four of a kind")
+  }
+  else{
+    return("other")
+  }
+}
+```
+
+
+2b) (2 points) Create a function that checks if a collection of five cards is one of the other types of *hands* (your pick). If so, return a value that indicates the specific *hand* type, otherwise return "Other". 
+```{r}
+ThreeOfAKind <- function(df)
+{
+  count <- 0
+  done <- F
+  j <- 1
+  while(!done && j < 6)
+  {
+    count <- 0
+    for(i in 1:5)
+    {
+      if(df[j,3] == df[i,3])
+      {
+        count <- count + 1
+      }
+    }
+    if(count == 3)
+    {
+      done <- T
+    }
+    j <- j + 1
+  }
+  
+  if(count == 3)
+  {
+    return("three of a kind")
+  }
+  else{
+    return("other")
+  }
+}
+
+```
+
+
+2c) (2 point) Draw 5 cards from `card_deck` (without replacement), and check if you have either collection type in (2a) or (2b).  Repeat this process 100,000 times.  
+```{r}
+set.seed(12398)
+vec <- c()
+for(i in 1:1000)
+{
+  cards <- card_deck[sample.int(52,5),]
+  vec <- c(vec,FourOfAKind(cards))
+}
+
+```
+
+
+(2d) (1 point)  Based on your simulation above, what is the probability of drawing "four of a kind"?  What is the probability of drawing the other *hand* type you selected?  
+\
+The probability of drawing "four of a kind" is 0/1000.
+
+
+
+
+**Question 3: Simulation Recreation with Reeses Pieces (13 points)**
+
+For this question we will be recreating parts of the simulation from this [website](http://www.rossmanchance.com/applets/2021/oneprop/OneProp.htm?candy=1).  In this simulation we are sampling Reeses Pieces (they are like M&Ms) candy.  The focus is studying the total number of orange candies that come out of a candy machine under various situations. 
+
+3a) (1 point) Write a function with two inputs: 
+
+- ProbabilityOfOrange: the probability of getting an orange candy (a number between 0 and 1). 
+
+- NumberCandies: the number of candies that come out of the machine (a whole number). 
+
+Have this function generate candies that come out of the machine.  Count the number of candies that are orange.  Return the total number of orange candies that are orange. 
+
+```{r}
+genData <- function(ProbabilityOfOrange,NumberCandies)
+{
+  CandyColor <- c("orange","non-orange")
+  probs <- c(ProbabilityOfOrange, 1- ProbabilityOfOrange)
+  count <- 0
+  vec <- sample(CandyColor,NumberCandies,prob = probs,replace = T)
+  return(table(vec)[2])
+}
+```
+
+
+
+3b) (1 point) Call your function in part (3a) 1000 times using `ProbabilityOfOrange = .25` and `NumberCandies = 30`.  Store the results in a vector called `OrangeTotals`, and display a frequency table of these values.
+```{r}
+OrangeTotals <- replicate(1000, genData(0.25,30))
+table(OrangeTotals)
+```
+
+
+
+3c) (2 points) Call your function part (3a) again, this time implement a stopping rule. Let $p_i$ be the estimated average number of orange candies that come out of the machine using all the simulations up to $i$. Set your seed to 26. Make at least 25 simulations, and stop once $|p_i - p_{i-1}|<0.001$. 
+```{r}
+set.seed(26)
+i <- 2
+data <- replicate(25,genData(0.25,30))
+p <- c()
+for(i in 1:25)
+{
+  p <- c(p, sum(data[1:i]) / i)
+}
+while(abs(p[i] - p[i-1]) > 0.001)
+{
+  if(i > 24)
+  {
+    data <- c(data, genData(0.25,30))
+    p <- c(p, sum(data[1:i + 1]) / i + 1)
+  }
+  i <- i + 1
+}
+
+
+```
+
+3d) (3 points) Create side-by-side running average plots for the mean number of orange candies for your results in (3b) and (3c).  
+```{r}
+par(mfrow = c(1,2))
+hist(p)
+hist(OrangeTotals)
+```
+
+
+3e) (1 point) Does the estimated number of orange candies seem to stabilize in (3b)? In (3c)?  Why or why not?
+\
+No, because the sample size was too small.
+
+
+3f) (3 points) Write a function that generates a plot that is (somewhat) similar to the plot in this [website](http://www.rossmanchance.com/applets/2021/oneprop/OneProp.htm?candy=1). This function should have two arguments: 
+
+- DataResults: A vector where each element contains the number of orange candies generated for simulation.
+
+- NumberCandies: Total number of candies generated for each simulation. 
+
+This function should create a bar plot (or a histogram) of the distribution of the number of orange candies using the simulations. Make sure that the bins of the bar chart only correspond to one number.  There should be a bin for 0, 1, ..., NumberCandies. In addition, return a *named* vector that contains the  (arithmetic) mean and standard deviation for the number of orange candies across the simulations.  
+```{r}
+genPlot <- function(DataResults,NumberCandies)
+{
+  hist(DataResults, breaks = 1:max(DataResults))
+  res <- c("mean" = sum(DataResults) / sum(NumberCandies),
+           "standard deviation" = sd(DataResults))
+}
+```
+
+
+3g) (1 point) Using your data from (3b) and the function in (3f) to plot the distribution of the number of orange candies.
+```{r}
+genPlot(OrangeTotals,1000*30)
+
+```
+
+
+3h) (1 point) Call your function(s) above to generate 500 simulations of getting candy from the machine where you get a total of 20 candies for each simulation and the probability of getting an orange candy is 50\%.  Plot the distribution chart for this data using 500 samples using (3f). 
+
+```{r}
+genPlot(replicate(500,genData(0.5,20)),500*20)
+```
+
+
+**Question 4: Mini Simulation Study (7 points)**
+
+In class we specifically talked about using a simulation study to estimate the probability of a specific event, to estimate the distribution of a simple random variable, and to estimate the distribution of a statistic (the mean). In this question you will create your own mini simulation study. You can continue using the orange candies from above, but you need to ask a unique question.  You can also make a new example, perhaps with candies but there are more colors or different parameters. You can also pick something else entirely! 
+
+Some Examples (you can pick from this list, modify something from this list, or make up your own unique question): 
+
+-  Suppose there are only three colors of Reeses Pieces, all three colors are equally likely, and we always sample 15 at a time.  How often would I expect to always have the exact same amount of all three colors?
+
+- How often does a 95\% confidence interval generated from using data that is a normally distributed actually capture the mean?
+
+- An assumption of the CLT states that every data point has to come from the same distribution.  If I instead sample from two distributions (or mix them up), will the distribution of the sample mean look approximately normal?
+
+- Suppose there are four colors of Reeses Pieces, all three colors are equally likely, I only pick up one candy at a time and I stop picking up candies once I have 5 orange. How many times do I typically have to draw candies before I reach 5?
+
+- If I simulate 100 values from a standard normal distribution, what is the proportion of these values that I would expect to be "outliers" according to the Z-score method? 
+
+- There are 52 cards in a deck, the deck is shuffled, and four of the cards are aces. I draw one card at a time until I have all four aces. How many cards do I need to draw before I get all four aces?  (Another aspect to consider: with replacement or without replacement)
+
+
+4a) (1 point) What is the unique question you want to investigate with your simulation study?  This should be a specific question like the examples above. 
+\-  Suppose there are only three colors of Reeses Pieces, all three colors are equally likely, and we always sample 15 at a time.  How often would I expect to always have the exact same amount of all three colors?
+
+
+4b) (1 point) Show an example of a single simulation.  This can be a custom function, or just a sequence of commands. 
+```{r}
+resses <- function(prob,times)
+{
+  col = c("R","G", "B")
+  vec <- sample(col, times, replace = T,prob = prob)
+  t <- table(vec)
+  return(t[1] == t[2] && t[2] == t[3])
+}
+resses(c(0.3,0.3,0.3),15)
+```
+
+4c) (2 points) Conduct at least 500 simulations. Save the results for what you are trying to investigate, and only output the first few results as a preview (do not output everything, it is too much to read, just show a subset).  If it is convenient you can display your results in a summary table. 
+```{r}
+set.seed(200)
+vec <- replicate(500,resses(c(0.3,0.3,0.3),15))
+vec[1:10]
+```
+
+
+4d) (2 points) Create a plot that showcases your results.  Have correct title, labels, appropriate coloring, and graph type.  
+```{r}
+lab <- c(table(vec)[1]/500, table(vec)[2]/500)
+pie(table(vec), labels = lab, main = "prob of exact number in three color")
+```
+
+
+4e) (1 point) Interpret your graph from (4d).  What is the answer to your question from (4a)? Where there limitations to your simulation study?  What are some things you can do to improve it? (Use complete sentences). \
+\ 
+\
+The prob of exact same numbers of three different color pie is really low, in the simulation of 500 times. the problity is only 0.054.
+
