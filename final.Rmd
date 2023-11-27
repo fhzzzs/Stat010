@@ -1,0 +1,313 @@
+---
+title: "Final"
+author: "Ivan Ao"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Instructions
+- You can use the packages `wordcloud`, `stringr`, `stringi`, `dplyr`, `ggplot2` and any packages in `Tidyverse`.  If you wish to use any additional packages beyond "Base R" (the default) and these packages email Rebecca (`rkurt001@ucr.edu`) for permission.
+- Use R to answer the questions below. 
+- Check Piazza regularly for clarification on questions, there may be important posts that will not be announced through *Elearn*.  
+- Direct questions to Rebecca (rkurt001@ucr.edu). 
+
+
+### Question 1: Exam Simulation (12 points)
+
+Suppose a teacher distributes a multiple choice test to their students.  The test has 20 questions, and each question has answers "A", "B", "C", "D".  All questions only have one correct answer.  There is an old piece of an advice that if you do not know the answer to a question, you should *always* select the same option, i.e. "C". We will do a simulation study to test this hypothesis.  
+
+Suppose a student thinks they know answer to a question and they select the correct answer approximately `p` percent of the time.  This means that `1-p` percent of the time they need to guess what answer they should select.  They can either guess at random, or they can always select the answer (i.e. always pick "C").  
+
+To determine which strategy is better when answering a question you do not know the answer to (always random guessing, or always picking the same letter) we will do a simulation study. We will simulate a student taking the exam thousands of times, and observe what the typical outcome would be.  We want to do this thousands of times because of random fluctuation.  Sometimes a single simulation might not be very representative, so we instead we look at many simulations to get the *long run behavior* (also known as expected value). To check your work on this problem use this website [https://rpgarcia.shinyapps.io/ExamStrategy/](https://rpgarcia.shinyapps.io/ExamStrategy/). 
+
+1a) (1 point) For each simulation we need to generate a unique answer key. Show an example of how to generate an answer key with 20 questions where each answer is "A", "B", "C" or "D" randomly distributed. 
+```{r}
+answer <- c("A","B","C","D")
+sample(answer, 20, replace = T)
+```
+
+1b) (2 points) Create a function to determine if a student correctly selected the correct answer for ONE question. This function will have arguments that indicate what the true answer is, if the student knows this answer or will have to guess (which is random), and what the guessing strategy is.  
+
+Use inputs: 
+
+- `correct_answer`: a character vector of length 1. Represents the correct answer for question, this argument is always equal to "A", "B", "C", or "D".
+
+- `p`: a numeric vector of length 1. Represents the probability that the student knows and selects the correct answer for this question. 
+
+- `strategy`: a character vector of length 1. If `strategy` is equal to "guess", then the students guesses at random what the correct answer is, if `strategy` is equal to "A", "B", "C", or "D", then the student *always* picks that respective letter when trying to answer a question. 
+
+Have this function return 1 if the student got the answer correct, and 0 if not. 
+```{r}
+answer <- c("A","B","C","D")
+#sample(answer, 20, replace = T)
+Check_answer <- function(correct_answer,p,strategy)
+{
+  if(sample(x = c(1,0),size = 1, prob = c(p,1-p)))
+  {
+    ans <- correct_answer
+  }else
+  {
+    if(strategy == "guess")
+    {
+      ans <- sample(x = answer,size = 1)
+    }else if(strategy == "A")
+    {
+      ans <- "A"
+      
+    }else if(strategy == "B")
+    {
+      ans <- "B"
+    }else if(strategy == "C")
+    {
+      ans <- "C"
+    }else if(strategy == "D")
+    {
+      ans <- "C"
+    }  
+  }
+  return(ans == correct_answer)
+}
+```
+
+
+1c) (2 points) Build a function to simulate a student taking an exam with 20 questions (just one exam). This function will need to start by generating an answer key.  The function then needs to simulate a student taking a test: the student looks at a question, determines if they know the question, if the student knows the question they get it right, if the student does not know the question they must guess using the determined `strategy`, they continue through this process for all 20 questions. You can use the functions above, build your own functions, or another strategy to answer this question. 
+
+Use inputs: 
+
+- `p`: a numeric vector of length 1. Represents the probability that the student knows and selects the correct answer for this question. 
+
+- `strategy`: a character vector of length 1. If `strategy` is equal to "guess", then the students guesses at random what the correct answer is, if `strategy` is equal to "A", "B", "C", or "D", then the student *always* picks that respective letter when trying to answer a question.  If `strategy` is equal to anything else then terminate the function and print the message "User input error: incorrect strategy". 
+
+Have this function return the total number of questions the student got correct. 
+```{r}
+test <- function(p, strategy)
+{
+  answer_key <- sample(answer, 20, replace = T)
+  total <- 0
+  if(strategy != "A" & strategy != "B" & strategy != "C" & strategy != "D" &
+     strategy != "guess")
+  {
+    return("incorrect strategy");
+  }
+  for(i in 1:20)
+  {
+    if(Check_answer(answer_key[i],p,strategy))
+    {
+      total <- total + 1
+    }
+  }
+  return(total)
+}
+```
+
+
+1d) (1 point) Using 1c simulate a student taking an exam (just one) where 
+
+- the probability they know and select the correct answer is 0.5, and if they do know no the correct answer they always "guess" any option at random
+
+- the probability they know and select the correct answer is 0.5, and if they do know no the correct answer they always select "C"
+
+Produce the total number of questions they got correct for each strategy. 
+```{r}
+test(0.5,"guess")
+test(0.5,"C")
+```
+
+
+1e) (1 point) Repeat your simulations in 1d, each 1000 times.  Store your results in two different vectors.
+```{r}
+guess <- replicate(1000,test(0.5,"guess"))
+C <- replicate(1000,test(0.5,"C"))
+```
+
+
+1f) (2 point) Create a bar chart of the two different strategies.  Make sure both strategies are represented in the same plotting window, and that there is appropriate axis labels.  Change the default colors of the plot. 
+```{r}
+library(ggplot2)
+df <- data.frame(value = c(C,guess),
+                 strategies = c(rep("C", length(C)), 
+                            rep("Guess", length(guess))))
+
+ggplot(data = df, aes(value, fill = strategies)) +
+  geom_bar(position = "dodge") + 
+  xlab("Number of correct answer") +
+  ylab("Times")
+
+
+
+```
+
+
+1g) (2 points) Create a plot of your choice that compares the simulations. The plot should contain information on both strategies, either side-by-side or together in the the same plotting window.  
+```{r}
+# my choice is A if don't know
+A <- replicate(1000,test(0.5,"A"))
+
+df <- data.frame(value = c(A,guess),
+                 strategies = c(rep("A", length(A)), 
+                            rep("Guess", length(guess))))
+
+ggplot(data = df, aes(value, fill = strategies)) +
+  geom_bar(position = "dodge") + 
+  xlab("Number of correct answer") +
+  ylab("Times")
+
+```
+
+
+1h) (1 point) Describe what you plotted in 1h in detail.  What type of plot did you create?  If there are axis, describe them.  If there is a color scheme, or other aspects of the plot that change by a variable, describe them as well. Clearly describe what you plotted above and what information you would conclude based on the two strategies. \
+\
+I created a bar plot, x axis is the number of correct answer in one exam, and y is how many times in one test student get this number of correct answers. I color the data based on the strategies.
+
+**Question 2: Taylor Swift -- Discography (10 points)**
+
+ 
+Load the data set `TaylorSwift.csv` from *ELearn*. This is a *modifed* data set from [https://www.kaggle.com/thespacefreak/taylor-swift-song-lyrics-all-albums](https://www.kaggle.com/thespacefreak/taylor-swift-song-lyrics-all-albums). Each row corresponds to a particular line/lyric for a particular song and album by Taylor Swift. 
+
+2a) (2 points) Create a 2D object (data frame or tibble) that has the following columns for each album in the `TaylorSwift` data set. 
+
+- `Album`: The name of the respective album
+
+- `Tracks`: The total number of tracks for each album
+
+- `SongLength`: Average number of lines for each track on the album 
+
+Your resulting object should have 9 rows, one for each album. 
+```{r}
+library(tidyverse)
+TaylorSwift <- read.csv("./TaylorSwift.csv")
+album <- TaylorSwift %>%
+  group_by(album_name) %>%
+  summarise(Tracks =  sum(track_n), SongLength = mean(line))
+album
+```
+
+
+2b) (2 points) Create a 2D object (data frame or tibble) that has the following columns for each track for each album (that is, each row corresponds to a particular track in a particular album).  Have this data set contain the following columns:
+
+- `Album`: The name of the album the track is on
+
+- `TrackTitle`: The name of the given track
+
+- `TrackNum`: Which track number this is for the given album
+
+- `NumLines`: Total number of lines for the given track  
+
+- `Lyrics`: All of the lyrics, in order, for a the given track. Have each new line separated by a "---"
+
+Organize the 2D object by album name, and then by track number. Display the first few rows. 
+```{r}
+TF <- TaylorSwift %>%
+  group_by(album_name,track_title,track_n,) %>%
+  summarise(NumLines = max(line), Lyrics = paste(lyric, collapse = "---"))
+names(TF) <- c("Album", "TrackTitle", "TrackNum", "NumLines", "Lyrics")
+slice(TF, 1:5)
+```
+
+
+
+2c) (3 points) Create a subset of all rows of the data set created in Q2b where the track titles are also the album title. Show how to do this using THREE different techniques (i.e. indexing, tidyverse, apply functions, loops, subset(), etc.). 
+```{r}
+sub1 <- TF[TF[,1] == TF[,2],]
+sub2 <- TF %>%
+  filter(Album == TrackTitle)
+sub3 <- TF[TF$Album == TF$TrackTitle,]
+
+```
+
+
+2d) (2 points) Use `ggplot2` to create a plot for the data set created in Q2b. Have this plot display the relationship between the total number of lines for each track, track number, and album. Your plot should be professional, and have appropriate labels/scales/colors/legends.  
+```{r}
+ggplot(data = TF,
+       aes(x = NumLines,
+           y = TrackNum,
+           color = Album
+           )) + 
+  geom_point()
+
+
+
+```
+
+
+2e) (1 point) Describe what you plotted in Q2d in detail.  What type of plot did you create?  If there are axis, describe them.  If there is a color scheme, or other aspects of the plot that change by a variable, describe them as well. \
+\
+I created a scatter plot in Q2d, the x-axis is how many lines of the lyrics, and y is the track number of that song, I seperate them by album using color. 
+
+**Question 3: Taylor Swift -- Pick a Song (8 points)**
+
+Pick a song of your choice using the `TaylorSwift` data set to answer the following questions. 
+
+3a) (2 points) Create a vector with every unique word across all of the lyrics for your song.  Do not consider capitalization or punctuation. For example: "year", "year," and "Year", should all be counted as the same word (i.e. "year"). Pick any 20 words and display them.
+```{r}
+lyrics <- TaylorSwift$lyric
+lyrics_text <- paste(lyrics, collapse = " ")
+lyrics_text <- tolower(lyrics_text)
+lyrics_text <- gsub("[[:punct:]]", "", lyrics_text)
+words <- strsplit(lyrics_text, " ")[[1]]
+unique_words <- unique(words)
+word_counts <- sort(table(words), decreasing = T)
+head(names(word_counts), 20)
+
+
+
+```
+
+
+3b) (1 points) Determine how many times the title of your song appears in the lyrics. Do not consider punctuation or capitalization.  For example: "year", "year," and "Year", should all be counted as the same word (i.e. "year"). 
+```{r}
+title <- TaylorSwift$track_title
+title <- paste(title, collapse = " ")
+title <- tolower(title)
+title <- gsub("[[:punct:]]", "", title)
+title_words <- strsplit(title, " ")[[1]]
+unique_title <- unique(title_words)
+freq <- sum(unique_title %in% words)
+freq
+
+```
+
+
+3c) (2 points) Create a 2D object (data frame or tibble)  where each row corresponds to a unique word in the lyrics where we do not consider capitalization or punctuation (i.e. the results from Q3a).  Have this object contain the following columns
+
+- `Word`: Character column. The unique word.
+
+- `NumChar`: Numeric column. The number of characters in the respective word.
+
+- `FourOrLess`: Logical column. Contains `TRUE` if the corresponding word has four or less characters, and `FALSE` if the corresponding word has strictly greater than four characters.
+
+- `ContainsE`: Factor column. Contains "yes" if the corresponding word has an "e" in it, and "no" if otherwise.
+
+- `NumOccurances`: Numeric Column.  The number of times this word appears across all lyrics.  
+
+Display any 6 rows of your choice from this data set. 
+```{r}
+df <- data.frame(Word = names(word_counts),
+                 NumChar = nchar(names(word_counts)),
+                 FourOrLess = nchar(names(word_counts)) < 5,
+                 ContainsE = factor(grepl("e", names(word_counts)), 
+                                    levels = c(F,T), 
+                                    labels = c("No", "Yes")),
+                 NumOccurances = as.vector(unname(word_counts)))
+
+sample_n(df, 6)
+```
+
+
+3d) (3 points) Create a word cloud for the words that are present in Taylor Swift lyrics.  Have the size of the word be proportional to the frequency that the word occurs. Change the color(s) of some of the words based on a criteria of your choice.  *Describe in words the criteria used, or include a legend that clearly indicates what the different colors distinguish*. NOTE: You do not have to consider *all words*, you can subset the words if you want.  Make sure what you are plotting is clear. 
+```{r}
+library(wordcloud)
+color <- c("red", "green", "blue", "yellow", "purple",
+                "black", "white", "pink", "gray", "orange")
+wordcloud(words = names(word_counts[1:10]),
+          freq = word_counts[1:10], 
+          color = color,
+          ordered.colors = T)
+```
+\
+\
+I change the color based on the freq, and i make my own color pattern for the graph.
+

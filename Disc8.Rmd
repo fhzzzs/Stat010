@@ -1,0 +1,80 @@
+---
+title: "Discussion 8"
+author: "Ivan Ao"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1) (2 points) Create a function which can generate random sample of `n` observations from either a normal distribution (`rnorm()`) and another distribution of your choice (except the t-distribution). For both of these distributions change the distribution parameters to something other than the default. 
+
+This function should have two arguments: 
+
+- `n`: number of observations to draw from
+
+- `distr`: indicates which distribution to draw from.
+
+Have this function return the sample (arithmetic) mean using the data generated.
+
+```{r}
+# Uniform distribution and norm
+func <- function(n, distr)
+{
+  if(distr ==  "Uniform")
+  {
+    return(mean(runif(n)))
+  }
+  else if(distr == "Normal"){
+    return(mean(rnorm(n)))
+  }else
+  {
+    return(-1)
+  }
+}
+```
+
+
+2) (4 points) Call your function created in Q1 1000 times for *each* situation below: 
+
+- Situation 1: using `n=40` for your normal distribution
+```{r}
+Q1 <- replicate(1000,func(n=40, distr = "Normal"))
+```
+
+- Situation 2: using `n=4` for your normal distribution
+```{r}
+Q2 <- replicate(1000,func(n=4, distr = "Normal"))
+```
+
+
+- Situation 3: using `n=40` for your distribution that is *not normally distributed*
+```{r}
+Q3 <- replicate(1000, func(n=40, distr = "Uniform"))
+```
+
+
+You should now have 1000 means for situation 1, 1000 means for situation 2, and 1000 means for situation 3. Create side-by-side-by-side a histograms for these three situations where: 
+
+- the y-axis is the proportions of observations per bin instead of the frequency  
+```{r}
+par(mfrow = c(1,3))
+hist(Q1)
+hist(Q2)
+hist(Q3)
+```
+
+
+HINT: use `replicate()`
+
+
+
+
+A Few Notes: 
+
+- Observe that the data is coming from a distribution that is not normal in situation 3, but the simulated means still form an approximately normal distribution. This is the "magic" of the fundamental theorem of statistics (FTS)!!!!!!!!! The "magic" being that the (arithmetic) mean will *always* be normally distributed if it meets the FTS assumptions.  This is *why* the normal distribution is so cool :)
+
+- The simulation in situation 2 actually *violates* an assumption of FTS.  This means that the data is not necessarily normally distributed. The assumption it does not meet is sample size, in practice this assumption violation is not as detrimental as other assumption violations.
+
+- Recall: the fundamental theorem of statistics, the central limit theorem, and the law of large numbers are all the same thing. 

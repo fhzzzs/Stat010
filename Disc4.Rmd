@@ -1,0 +1,51 @@
+---
+title: "Discussion 4"
+author: "Ivan Ao"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1) There is a built-in data set called  `ChickWeight`. Load this data set into your environment. Open up the help file for this data set.  What does the "Description" in the help file say.
+```{r}
+CWeight <- ChickWeight
+head(CWeight)
+```
+The ChickWeight data frame has 578 rows and 4 columns from an experiment on the effect of diet on early growth of chicks.
+
+
+2) Determine the (arithmetic) mean of weights at `Time = 0`. 
+```{r}
+mean(CWeight$weight[CWeight$Time == 0])
+```
+
+3) Notice that there are 50 different chicks in the study, and the `Chick` column is an ordered factor with a non-obvious ordering structure.  Look at the help file to determine how the ordering was done for this factor column. \
+Chick is an ordered factor with levels 18 < ... < 48 giving a unique identifier for the chick. The ordering of the levels groups chicks on the same diet together and orders them according to their final weight (lightest to heaviest) within diet.
+
+
+4) Create a function that converts Celsius to Fahrenheit. 
+```{r}
+CToF <- function(C)
+{
+  return (C*1.8+32)
+}
+```
+
+5) Try the temperatures 0, 32, 22.2, 37 for your function in Q4 and output the results. 
+```{r}
+CToF(0)
+CToF(32)
+CToF(22.2)
+CToF(37)
+```
+
+6) Create a new data frame called `ChickWeight2` that contains all the chicks with weight greater than 200, and only contains the columns `weight` and `Time`. 
+```{r}
+ChickWeight2 <- data.frame(Weight = ChickWeight$weight[ChickWeight$weight > 200], Time = ChickWeight$Time[ChickWeight$weight > 200])
+head(ChickWeight2)
+```
+

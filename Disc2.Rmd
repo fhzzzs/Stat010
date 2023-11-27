@@ -1,0 +1,45 @@
+---
+title: "Discussion 2"
+author: "Ivan Ao"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+1) Create a logical vector of length 6.  Set the first, fourth, and fifth elements to be TRUE and let the of the elements be FALSE. Call it `logi_vec`.
+```{r}
+logi_vec <- c(T, F, F, T, T, F)
+logi_vec
+```
+
+
+2) Use the `as.double()` function to transform `logi_vec` into a double vector called `dbl_vec`. 
+```{r}
+dbl_vec <- as.double(logi_vec)
+dbl_vec
+```
+
+
+3) Comment on what you noticed about this conversion in the previous prompt. 
+It convert True to 1 and False to 0.
+
+4) Check if each element of `logi_vec` is (strictly) less than 1. Do the same thing with `dbl_vec`. 
+```{r}
+logi_vec < 1
+dbl_vec < 1
+```
+
+
+5) Write the the Pythagorean Theorem using markdown/latex math formula syntax. 
+
+$a^2 + b^2 = c^2$
+
+6) Write Newton's law of universal gravitation (on Elearn) using markdown/latex math formula syntax. 
+
+$F = G \frac{m_{1}m_{2}}{r^2}$
+

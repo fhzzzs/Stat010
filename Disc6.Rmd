@@ -1,0 +1,61 @@
+---
+title: "Discussion 6"
+author: "Ivan Ao"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+1) Create a function that has only one argument, `vec`.  Let `vec` be any arbitrary numeric vector. In this function add all elements in `vec` that are even together, and return this sum.  (1 points)
+```{r}
+func1 <- function(vec)
+{
+    return(sum(vec[as.logical(vec%%2 == 0)]))
+}
+```
+
+
+
+
+2) Call your function from above using the vectors: `62, 13.1, 26.2, 3.2, 5, 4` and `-5.2, -pi, exp(4), log(100), 1`. (1 point)
+```{r}
+vec <- c(62, 13.1, 26.2, 3.2, 5, 4)
+func1(c(62, 13.1, 26.2, 3.2, 5, 4))
+func1(c(-5.2, -pi, exp(4), log(100), 1))
+```
+
+
+
+
+Download the data set "Firework.csv" on Elearn.  This contains the lyrics to Katy Perry's song "Firework". Each line in the data set is a line from the song, in order. 
+
+3) Create a frequency table of word counts. Do not count words that end with commas or question marks as different. For example, "years" and "years?" should both be counted as "years". Organize it from most frequent to least frequent.  Display the top 15 most common words. (2 points)
+```{r}
+firework <- read.csv("./Firework.csv")
+firework_vec <- gsub("[[:punct:]]", " ", firework)
+firework_vec <- strsplit(firework_vec, " ")
+firework_vec <- lapply(firework_vec, function(z){ z[!is.na(z) & z != ""]})
+firework_vec <- sort(table(firework_vec), decreasing = T)
+firework_vec[1:15]
+
+```
+
+
+4) Look up the help file for the `wordcloud` function.  Create a word cloud for the data in the previous question that colors the words in to two different colors. (1 point)
+```{r}
+library(RColorBrewer)
+library(wordcloud)
+wordcloud(words = names(firework_vec[1:2]), freq = firework_vec[1:2], color = c("red","yellow"),ordered.colors = T)
+
+```
+
+
+
+5) How are the colors assigned to words in the previous step?  (Discuss in detail, 1 point). \
+ I have to assigned the word 1 by 1.

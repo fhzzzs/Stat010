@@ -1,0 +1,41 @@
+---
+title: "Discussion 3"
+author: "Ivan Ao"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+Use built-in *rock* data set in R to answer the questions on this discussion. This data set contains measurements on 48 rock samples from a petroleum reservoir (area = area of pores, peri = total perimeter of pores, shape = perimeter/sqrt(area), perm = permeability).
+
+
+
+1) Store the *peri* column of the *rock* data set as a vector called `peri_vec`. (1 point)
+```{r}
+peri_vec = rock$peri
+peri_vec
+```
+
+
+2) Look at the four indexing techniques for atomic vectors using the `[]` operator in Section 5.1 of the Github notes.  Use two of these techniques to isolate and display all fares in `peri_vec` that are larger than (arithmetic) mean of `peri_vec`. That is, create the same output two different ways. (2 points)
+```{r}
+peri_vec[peri_vec > mean(peri_vec)]
+
+peri_vec[c(which(peri_vec > mean(peri_vec)))]
+```
+
+
+3) Look at the three operators `[]`,  `[[]]`, `$` in Section 5.4 of the Github notes.  Use all three operators to isolate and display 26th value in the `area` column. That is, create the same output at least three different ways, one for each operator. (3 points). 
+```{r}
+rock$area[26]
+rock[[1]][26]
+rock[["area"]][26]
+```
+
+

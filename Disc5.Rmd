@@ -1,0 +1,89 @@
+---
+title: "Discussion 5"
+author: "Ivan Ao"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1) Create a function check if an inputted temperature (`temp`) is extreme.  You can assume the temperature is in Fahrenheit units. Return a character vector of length one called `status` which indicates if the inputted `temp` is "boiling", "freezing", or "good". Check the temperatures 220, 101, 40, -15. (2 points)
+```{r}
+checkTemp <- function(temp)
+{
+  if(temp >= 212)
+  {
+    return(c("boiling"))
+  }
+  else if(temp >32)
+  {    
+    return(c("good"))
+  }
+  else
+  {
+    return(c("freezing"))
+  }
+  return(NA)
+}
+sapply(c(220,101,40,-15), checkTemp)
+```
+
+
+
+
+2) Use `sapply()` to check the following vector of temperatures for the Q1.  (1 point)
+
+```{r}
+F_temp <- c(23, 41, 50, 26.6,  42.8, 104.0,
+            122.0,  78.8,  73.4,  59.0, 114.8,
+            -19.4,  71.6,  96.8,  277.0,  -17.6,  46.4,  59.0, 
+            51.8,  60.8,  64.4,  35.6,  289.6)
+sapply(F_temp,checkTemp)
+
+```
+
+
+3) Create a function called `extreme.temp()` that has two arguments.  Let the first argument be named `IsCelsius`, and the second argument called `temp`. If `IsCelsisus=TRUE` then the `temp` is in Celsius units, and if `FALSE` then `temp` is in Fahrenheit units. In this function check if the inputted temperature is extreme.  Return a single character element called `status` which indicates if the inputted `temp` is "boiling", "freezing", or "good". You may use/call functions created in last weeks assignment, use the function above, or create any supporting functions that you need.  Check the temperatures 20C, 10F, and 150C. (2 points)
+```{r}
+extreme.temp <- function(IsCelsius,temp)
+{
+  if(IsCelsius)
+  {
+    if(temp >= 100)
+    {
+      return(c("boiling"))
+    }
+    else if(temp > 0)
+    {
+      return(c("good"))
+    }
+    else
+    {
+      return(c("freezing"))
+    }
+    return(NA)
+  }
+  else
+  {
+    return(checkTemp(temp))
+  }
+}
+mapply(extreme.temp, c(T,F,T), c(20,10,150))
+```
+
+
+4) Download the data set `temperature_data.csv` on Elearn. The contains (pretend) experiment results collected by two researchers who used different units. Use `mapply()` to check if the temperatures are "boiling", "freezing", or "good". Display the first 15 values. (1 point)
+```{r}
+tempData <- read.csv("./temperature_data.csv")
+mapply(extreme.temp,tempData$Celsius,tempData$Temperature)[1:15]
+
+```
+
+
+
+
+
+

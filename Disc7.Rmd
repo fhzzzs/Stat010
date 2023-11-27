@@ -1,0 +1,70 @@
+---
+title: "Discussion 6"
+author: "Ivan Ao"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+wonder_of_world <- read.csv("./wonder_of_world.csv")
+library(maps)
+```
+
+
+1) Using the `maps` package generate a map of the world and plot the locations of the different "wonders of the world" using the latitude and longitude coordinates of the `wonders_of_world.csv` data set on Elearn. (1 point)
+```{r}
+map("world")
+points(wonder_of_world[,5], 
+       wonder_of_world[,4], 
+       pch = 16)
+
+```
+
+
+2) There are only a few states in the continental US that are listed in this data set. Generate map that only contains these states. Plot the wonders of the world for these states. (2 points)
+```{r}
+usa <- wonder_of_world[wonder_of_world$Country == "United States",]
+map("usa")
+points(usa[,5],
+       usa[,4],
+       pch = 16)
+```
+
+
+
+
+3) Create the function which has one argument `n`.  Have this function generate the first n Fibannaci numbers using a **while** loop.  Note that the Fibanacci sequence is formed by starting with the number 0, 1 and then adding the last two numbers to get the next number: 0, 1, 1, 2, 3, 5, 8, etc.  Call your function from Q3 using `n=8` and `n=30`. (2 points)
+```{r}
+fib <- function(n)
+{
+  vec <- c(0,1) 
+  while(length(vec) <= n)
+  {
+    vec <- c(vec, vec[length(vec)] + vec[length(vec) - 1])
+  }
+  return(vec)
+}
+fib(n = 8)
+fib(n = 30)
+```
+
+
+4) Redo the last example we did in class yesterday using a **for** loop instead of a while loop. (1 point)
+```{r}
+record_data <- iris[1,]  # initialize recorded data 
+check_data <- iris[-1,]  # The rows left to check 
+
+for(i in 1:nrow(check_data)){
+  if(check_data$Sepal.Length[1] < record_data$Sepal.Length[nrow(record_data)]){
+    record_data <- rbind(record_data, check_data[1, ])
+  } else {
+    check_data <- check_data[-1, ]
+  }
+}
+
+record_data
+```
+
+
