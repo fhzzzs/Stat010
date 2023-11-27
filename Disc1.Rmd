@@ -1,0 +1,55 @@
+---
+title: "Discussion 1"
+author: "Ivan Ao"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+1) Create a numeric object called `number` with a number of your choice. 
+```{r}
+number <- 1
+number
+```
+
+2) Use a logical operator to check if `number` is less than 62. 
+```{r}
+number < 62
+```
+
+3) Create a numeric vector called `v` with the following elements: 5, 2, $\pi$, 8, 4.3, $e^3$
+```{r}
+v <- c(5, 2, pi, 8, 4.3, exp(3))
+v
+```
+
+
+4) Use arithmetic operators to find the area of a sphere that has a radius of `number`. 
+```{r}
+pi * number^2
+```
+
+
+5) Use operators to create a vector of TRUE/FALSE values that correspond to the components of vector `v` that are between 2 and 4. 
+```{r}
+#bool <- c()
+#for(x in v)
+#{
+#  bool <- c(bool, x < 4 & x > 2)
+#}
+#bool
+(v < 4) & (v > 2)
+```
+
+
+6) Describe two different types of operators in your own words. 
+
+%% reminder operator, for example a %% b = c, c will be the reminder after a / b
+& and operator, for example a & b mean a and b must be both true if the output is true.
+
+**Please fill out the following survey**: https://forms.gle/gQwp9dw1dRLXj9Jv9
